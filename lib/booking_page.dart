@@ -7,7 +7,7 @@ class BookingPage extends StatefulWidget {
   final Map room;
   final String name;
 
-  const BookingPage({super.key, required this.room,  required this.name});
+   const BookingPage({super.key, required this.room, required this.name});
 
   @override
   State<BookingPage> createState() => _BookingPageState();
@@ -20,13 +20,11 @@ class _BookingPageState extends State<BookingPage> {
   final startController = TextEditingController();
   final endController = TextEditingController();
 
-
-  @override
+ @override
   void initState() {
-   super.initState();
-   nameController = TextEditingController(text: widget.name);
+    super.initState();
+    nameController = TextEditingController(text: widget.name);
   }
-  
 
   ////////////////////////////////////////////////////////////
   // DATE PICKER
