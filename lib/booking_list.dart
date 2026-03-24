@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-const String baseUrl = "http://localhost/flutter_booking_66709694/php_api/";
-const String imageUrl = "http://localhost/flutter_booking_66709694/php_api/images/";
+const String baseUrl = "http://localhost/booking_66709694/php_api/";
+const String imageUrl = "http://localhost/booking_66709694/php_api/images/";
 
 class BookingList extends StatefulWidget {
 

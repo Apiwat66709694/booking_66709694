@@ -4,14 +4,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'room_list.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginAdmin extends StatefulWidget {
+  const LoginAdmin({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginAdmin> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginAdmin> {
   TextEditingController username = TextEditingController();
   TextEditingController password = TextEditingController();
 
@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login User")),
+      appBar: AppBar(title: const Text("Login Admin")),
 
       body: Padding(
         padding: const EdgeInsets.all(20),

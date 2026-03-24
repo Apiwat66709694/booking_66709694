@@ -112,7 +112,7 @@ class _BookingPageState extends State<BookingPage> {
     }
 
     var url = Uri.parse(
-        "http://localhost/flutter_booking_66709694/php_api/add_booking.php");
+        "http://localhost/booking_66709694/php_api/add_booking.php");
 
     var response = await http.post(
       url,
@@ -197,7 +197,7 @@ Widget build(BuildContext context) {
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.network(
-                "http://localhost/flutter_booking_66709694/php_api/images/$roomImage",
+                "http://localhost/booking_66709694/php_api/images/$roomImage",
                 width: double.infinity,
                 height: 180,
                 fit: BoxFit.cover,
