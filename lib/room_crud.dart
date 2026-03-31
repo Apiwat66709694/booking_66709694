@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 
 import 'add_product_page.dart';
 import 'edit_product_page.dart';
-import 'booking_list.dart';
 import 'home_page.dart';
 
 //////////////////////////////////////////////////////////////
@@ -13,8 +12,9 @@ import 'home_page.dart';
 
 const String baseUrl =
     "http://127.0.0.1/booking_66709694/php_api/";
+
 //////////////////////////////////////////////////////////////
-// ✅ PRODUCT LIST PAGE
+// ✅ EQUIPMENT LIST PAGE
 //////////////////////////////////////////////////////////////
 
 class RoomPage extends StatefulWidget {
@@ -26,12 +26,12 @@ class RoomPage extends StatefulWidget {
 }
 
 class _ProductListState extends State<RoomPage> {
+
   List products = [];
   List filteredProducts = [];
 
   final TextEditingController searchController = TextEditingController();
-  
-  
+
   @override
   void initState() {
     super.initState();
@@ -45,7 +45,7 @@ class _ProductListState extends State<RoomPage> {
   Future<void> fetchProducts() async {
     try {
       final response =
-          await http.get(Uri.parse("${baseUrl}show_data.php"));
+          await http.get(Uri.parse("${baseUrl}get_rooms.php"));
 
       if (response.statusCode == 200) {
         setState(() {
@@ -65,7 +65,7 @@ class _ProductListState extends State<RoomPage> {
   void filterProducts(String query) {
     setState(() {
       filteredProducts = products.where((product) {
-        final name = product['room_name']?.toLowerCase() ?? '';
+        final name = product['eq_name']?.toLowerCase() ?? '';
         return name.contains(query.toLowerCase());
       }).toList();
     });
@@ -76,123 +76,60 @@ class _ProductListState extends State<RoomPage> {
   ////////////////////////////////////////////////////////////
 
   Future<void> deleteProduct(int id) async {
-    try {
-      final response = await http.get(
-        Uri.parse("${baseUrl}delete_product.php?id=$id"),
+    final response = await http.get(
+      Uri.parse("${baseUrl}delete_product.php?id=$id"),
+    );
+
+    final data = json.decode(response.body);
+
+    if (data["success"] == true) {
+      fetchProducts();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("ลบอุปกรณ์เรียบร้อย")),
       );
-
-      final data = json.decode(response.body);
-
-      if (data["success"] == true) {
-        fetchProducts();
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("ลบสินค้าเรียบร้อย")),
-        );
-      }
-    } catch (e) {
-      debugPrint("Delete Error: $e");
     }
   }
 
   ////////////////////////////////////////////////////////////
-  // ✅ CONFIRM DELETE
-  ////////////////////////////////////////////////////////////
-
-  void confirmDelete(dynamic product) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("ยืนยันการลบ"),
-        content: Text("ต้องการลบ ${product['room_name']} ?"),
-        actions: [
-          TextButton(
-            child: const Text("ยกเลิก"),
-            onPressed: () => Navigator.pop(context),
-          ),
-          TextButton(
-            child: const Text("ลบ"),
-            onPressed: () {
-              Navigator.pop(context);
-              deleteProduct(int.parse(product['id'].toString()));
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  ////////////////////////////////////////////////////////////
-  // ✅ OPEN EDIT PAGE
-  ////////////////////////////////////////////////////////////
-
-  void openEdit(dynamic product) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => EditProductPage(product: product),
-      ),
-    ).then((value) => fetchProducts());
-  }
-
-  ////////////////////////////////////////////////////////////
-  // ✅ UI
+  // UI
   ////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Room_List'),
-       actions: [
-          //////////////////////////////////////////////////////
-          // ดูรายการจอง
-          //////////////////////////////////////////////////////
-          IconButton(
-            icon: const Icon(Icons.list_alt),
-            tooltip: "ดูการจองทั้งหมด",
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const BookingList(),
-                ),
-              );
-            },
-          ),
 
-          
+      appBar: AppBar(
+        title: const Text('Equipment List'),
+        actions: [
+
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: (){
-
-              Navigator.pushAndRemoveUntil(context,
-               
-               MaterialPageRoute(
-                builder: (context) => const HomePage(),
-
-               ),
-               (Route) => false,
-               
-               );
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const HomePage(),
+                ),
+                (route) => false,
+              );
             },
-            
-            
           ),
         ],
       ),
 
       body: Column(
         children: [
+
           //////////////////////////////////////////////////////
           // 🔍 SEARCH
           //////////////////////////////////////////////////////
 
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: TextField(
               controller: searchController,
               decoration: const InputDecoration(
-                labelText: 'Search Room',
+                labelText: 'Search equipment',
                 prefixIcon: Icon(Icons.search),
               ),
               onChanged: filterProducts,
@@ -205,15 +142,15 @@ class _ProductListState extends State<RoomPage> {
 
           Expanded(
             child: filteredProducts.isEmpty
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: Text("ไม่มีข้อมูล"))
                 : ListView.builder(
-                   padding: const EdgeInsets.only(bottom: 80), // ✅ สำคัญมาก
                     itemCount: filteredProducts.length,
                     itemBuilder: (context, index) {
+
                       final product = filteredProducts[index];
 
                       String imageUrl =
-                          "${baseUrl}images/${product['image']}";
+                          "${baseUrl}images/${product['image'] ?? ''}";
 
                       return Card(
                         child: ListTile(
@@ -237,25 +174,37 @@ class _ProductListState extends State<RoomPage> {
                           // 🏷 NAME
                           //////////////////////////////////////////////////
 
-                          title: Text(product['room_name'] ?? 'No Name'),
+                          title: Text(product['eq_name'] ?? ''),
 
                           //////////////////////////////////////////////////
-                          // 📝 DESC
+                          // 📝 DETAIL + NUM
                           //////////////////////////////////////////////////
 
-                          subtitle:
-                              Text(product['location'] ?? ''),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("รายละเอียด: ${product['detail']}"),
+                              Text("จำนวน: ${product['num']}"),
+                            ],
+                          ),
 
                           //////////////////////////////////////////////////
-                          // 💰 PRICE
+                          // ⚙️ MENU
                           //////////////////////////////////////////////////
 
                           trailing: PopupMenuButton<String>(
                             onSelected: (value) {
                               if (value == 'edit') {
-                                openEdit(product);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        EditProductPage(product: product),
+                                  ),
+                                ).then((value) => fetchProducts());
                               } else if (value == 'delete') {
-                                confirmDelete(product);
+                                deleteProduct(
+                                    int.parse(product['id'].toString()));
                               }
                             },
                             itemBuilder: (_) => const [
@@ -271,7 +220,7 @@ class _ProductListState extends State<RoomPage> {
                           ),
 
                           //////////////////////////////////////////////////
-                          // 👉 DETAIL
+                          // 👉 DETAIL PAGE
                           //////////////////////////////////////////////////
 
                           onTap: () {
@@ -301,7 +250,7 @@ class _ProductListState extends State<RoomPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => const AddRoomPage(),
+              builder: (_) => const AddEquipmentPage(),
             ),
           ).then((value) => fetchProducts());
         },
@@ -311,7 +260,7 @@ class _ProductListState extends State<RoomPage> {
 }
 
 //////////////////////////////////////////////////////////////
-// ✅ PRODUCT DETAIL PAGE
+// ✅ DETAIL PAGE
 //////////////////////////////////////////////////////////////
 
 class ProductDetail extends StatelessWidget {
@@ -321,22 +270,20 @@ class ProductDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     String imageUrl =
-        "${baseUrl}images/${product['image']}";
+        "${baseUrl}images/${product['image'] ?? ''}";
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(product['room_name'] ?? 'Detail'),
+        title: Text(product['eq_name'] ?? 'Detail'),
       ),
+
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            //////////////////////////////////////////////////////
-            // 🖼 IMAGE
-            //////////////////////////////////////////////////////
 
             Center(
               child: Image.network(
@@ -350,12 +297,8 @@ class ProductDetail extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            //////////////////////////////////////////////////////
-            // 🏷 NAME
-            //////////////////////////////////////////////////////
-
             Text(
-              product['room_name'] ?? '',
+              product['eq_name'] ?? '',
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -364,24 +307,11 @@ class ProductDetail extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            //////////////////////////////////////////////////////
-            // 📝 DESC
-            //////////////////////////////////////////////////////
+            Text("รายละเอียด: ${product['detail']}"),
 
-            Text(
-             'location: ${product['location']} ',
-              
-              ),
             const SizedBox(height: 10),
 
-            //////////////////////////////////////////////////////
-            // 💰 PRICE
-            //////////////////////////////////////////////////////
-
-            Text(
-              'รองรับจำนวน: ${product['capacity']} คน',
-              style: const TextStyle(fontSize: 18),
-            ),
+            Text("จำนวนคงเหลือ: ${product['num']}"),
           ],
         ),
       ),

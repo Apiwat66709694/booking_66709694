@@ -141,7 +141,7 @@ class _BookingPageState extends State<BookingPage> {
     else if(data['status']=="unavailable"){
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("ห้องไม่ว่าง เวลาชนกัน")),
+        const SnackBar(content: Text("เพิ่มสินค้า หมด")),
       );
 
     }
@@ -177,7 +177,7 @@ Widget build(BuildContext context) {
   return Scaffold(
 
     appBar: AppBar(
-      title: Text("จอง $roomName"),
+      title: Text("ชื้อ $roomName"),
     ),
 
     body: Padding(
@@ -228,7 +228,7 @@ Widget build(BuildContext context) {
               controller: nameController,
               readOnly: true,
               decoration: const InputDecoration(
-                labelText: "ชื่อผู้จอง",
+                labelText: "ชื่อผู้ชื้อ",
                 border: OutlineInputBorder(),
               ),
             ),
@@ -243,7 +243,7 @@ Widget build(BuildContext context) {
               controller: dateController,
               readOnly: true,
               decoration: const InputDecoration(
-                labelText: "วันที่จอง",
+                labelText: "วันที่ชื้อ",
                 border: OutlineInputBorder(),
                 suffixIcon: Icon(Icons.calendar_today),
               ),
@@ -290,7 +290,7 @@ Widget build(BuildContext context) {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: saveBooking,
-                child: const Text("บันทึกการจอง"),
+                child: const Text("บันทึกการชื้อ"),
               ),
             )
 

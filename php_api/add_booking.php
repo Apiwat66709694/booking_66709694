@@ -13,8 +13,8 @@ $end_time = $_POST['end_time'];
 // CHECK TIME CONFLICT
 ////////////////////////////////////////////////////
 
-$sql_check = "SELECT * FROM bookings
-WHERE room_id = :room_id
+$sql_check = "SELECT * FROM equipment
+WHERE eq_name = :room_id
 AND booking_date = :booking_date
 AND start_time < :end_time
 AND end_time > :start_time";
@@ -32,7 +32,7 @@ if($stmt->rowCount() > 0){
 
     echo json_encode([
         "status"=>"unavailable",
-        "message"=>"ห้องไม่ว่าง เวลาซ้อนกัน"
+        "message"=>"ไม่มีสินค้า"
     ]);
 
     exit;

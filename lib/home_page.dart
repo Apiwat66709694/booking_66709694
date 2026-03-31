@@ -13,7 +13,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       // 🔹 AppBar = แถบด้านบนของแอป
-      backgroundColor: const Color.fromARGB(255, 94, 37, 252), // ✅ ใส่ตรงนี้
+      backgroundColor: const Color.fromARGB(255, 215, 201, 255), // ✅ ใส่ตรงนี้
       appBar: AppBar(
         title: const Text('หน้าแรก'),
         backgroundColor: const Color.fromRGBO(100, 162, 255, 1),
@@ -27,8 +27,8 @@ class HomePage extends StatelessWidget {
           children: [
             // 🔸 Header ของ Drawer (ส่วนหัว)
             const UserAccountsDrawerHeader(
-              accountName: Text('อภิวัตต์ แก้วมรกตทิพย์'), // ชื่อผู้ใช้
-              accountEmail: Text('66709694@chonburi.spu.ac.th'), // อีเมล
+              accountName: Text('ใส่ชื่อนักศึกษา'), // ชื่อผู้ใช้
+              accountEmail: Text('ใส่รหัสนักศึกษา'), // อีเมล
               currentAccountPicture: CircleAvatar(
                 child: Icon(Icons.person), // ไอคอนโปรไฟล์
               ),
@@ -45,8 +45,8 @@ class HomePage extends StatelessWidget {
 
             // 🔸 เมนู: ไปหน้า Page 1
             ListTile(
-              leading: const Icon(Icons.event_available),
-              title: const Text('ข้อมูลการจอง'),
+              leading: const Icon(Icons.shopping_cart),
+              title: const Text('อุปกรณ์'),
               onTap: () {
                 Navigator.pop(context); // ปิด Drawer ก่อน
 
@@ -60,8 +60,8 @@ class HomePage extends StatelessWidget {
 
             // 🔸 เมนู: ไปหน้า Page 2
             ListTile(
-              leading: const Icon(Icons.manage_accounts),
-              title: const Text('Admin'),
+              leading: const Icon(Icons.login),
+              title: const Text('เข้าสู่ระบบ'),
               onTap: () {
                 Navigator.pop(context); // ปิด Drawer ก่อน
 

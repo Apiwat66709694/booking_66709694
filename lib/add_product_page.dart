@@ -5,35 +5,32 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
-class AddRoomPage extends StatefulWidget {
-  const AddRoomPage({super.key});
+class AddEquipmentPage extends StatefulWidget {
+  const AddEquipmentPage({super.key});
 
   @override
-  State<AddRoomPage> createState() => _AddProductPageState();
+  State<AddEquipmentPage> createState() => _AddEquipmentPageState();
 }
 
-class _AddProductPageState extends State<AddRoomPage> {
+class _AddEquipmentPageState extends State<AddEquipmentPage> {
 
   ////////////////////////////////////////////////////////////
-  // ✅ Controllers
+  // ✅ Controllers (ตรง DB)
   ////////////////////////////////////////////////////////////
 
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController capacityController = TextEditingController();
-  final TextEditingController locationcontroller = TextEditingController();
+  final TextEditingController nameController = TextEditingController();   // eq_name
+  final TextEditingController numController = TextEditingController();    // num
+  final TextEditingController detailController = TextEditingController(); // detail
 
   ////////////////////////////////////////////////////////////
-  // ✅ Image (ใช้ XFile รองรับ Web)
+  // 🖼 IMAGE
   ////////////////////////////////////////////////////////////
 
   XFile? selectedImage;
 
   Future<void> pickImage() async {
     final picker = ImagePicker();
-
-    final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-    );
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       setState(() {
@@ -43,10 +40,10 @@ class _AddProductPageState extends State<AddRoomPage> {
   }
 
   ////////////////////////////////////////////////////////////
-  // ✅ Save Product + Upload Image
+  // 💾 SAVE
   ////////////////////////////////////////////////////////////
 
-  Future<void> saveProduct() async {
+  Future<void> saveEquipment() async {
 
     if (selectedImage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -56,25 +53,24 @@ class _AddProductPageState extends State<AddRoomPage> {
     }
 
     final url = Uri.parse(
-      "http://localhost/booking_66709694/php_api/insert_room.php",
+      "http://127.0.0.1/booking_66709694/php_api/insert_room.php",
     );
 
     var request = http.MultipartRequest('POST', url);
 
     ////////////////////////////////////////////////////////////
-    // ✅ Fields
+    // ✅ Fields (ต้องตรง PHP)
     ////////////////////////////////////////////////////////////
 
-    request.fields['room_name'] = nameController.text;
-    request.fields['capacity'] = capacityController.text;
-    request.fields['location'] = locationcontroller.text;
+    request.fields['eq_name'] = nameController.text;
+    request.fields['num'] = numController.text;
+    request.fields['detail'] = detailController.text;
 
     ////////////////////////////////////////////////////////////
-    // ✅ Upload Image (แยก Web / Mobile)
+    // 📤 Upload Image
     ////////////////////////////////////////////////////////////
 
     if (kIsWeb) {
-
       final bytes = await selectedImage!.readAsBytes();
 
       request.files.add(
@@ -84,9 +80,7 @@ class _AddProductPageState extends State<AddRoomPage> {
           filename: selectedImage!.name,
         ),
       );
-
     } else {
-
       request.files.add(
         await http.MultipartFile.fromPath(
           'image',
@@ -96,7 +90,7 @@ class _AddProductPageState extends State<AddRoomPage> {
     }
 
     ////////////////////////////////////////////////////////////
-    // ✅ Execute
+    // 🚀 SEND
     ////////////////////////////////////////////////////////////
 
     var response = await request.send();
@@ -107,7 +101,7 @@ class _AddProductPageState extends State<AddRoomPage> {
     if (data["success"] == true) {
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("เพิ่มห้องเรียบร้อย")),
+        const SnackBar(content: Text("เพิ่มอุปกรณ์เรียบร้อย")),
       );
 
       Navigator.pop(context, true);
@@ -121,23 +115,24 @@ class _AddProductPageState extends State<AddRoomPage> {
   }
 
   ////////////////////////////////////////////////////////////
-  // ✅ UI
+  // UI
   ////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-      appBar: AppBar(title: const Text("เพิ่มห้อง")),
+      appBar: AppBar(title: const Text("เพิ่มอุปกรณ์")),
 
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
 
         child: SingleChildScrollView(
           child: Column(
             children: [
 
               ////////////////////////////////////////////////////////////
-              // 🖼 Image Preview (สำคัญมาก)
+              // 🖼 IMAGE
               ////////////////////////////////////////////////////////////
 
               GestureDetector(
@@ -145,35 +140,25 @@ class _AddProductPageState extends State<AddRoomPage> {
                 child: Container(
                   height: 150,
                   width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                  ),
+                  decoration: BoxDecoration(border: Border.all()),
                   child: selectedImage == null
-                      ? const Center(
-                          child: Text("แตะเพื่อเลือกรูป"),
-                        )
+                      ? const Center(child: Text("แตะเพื่อเลือกรูป"))
                       : kIsWeb
-                          ? Image.network(
-                              selectedImage!.path, // ✅ Web
-                              fit: BoxFit.cover,
-                            )
-                          : Image.file(
-                              File(selectedImage!.path), // ✅ Mobile
-                              fit: BoxFit.cover,
-                            ),
+                          ? Image.network(selectedImage!.path, fit: BoxFit.cover)
+                          : Image.file(File(selectedImage!.path), fit: BoxFit.cover),
                 ),
               ),
 
               const SizedBox(height: 15),
 
               ////////////////////////////////////////////////////////////
-              // 🏷 Name
+              // 🏷 NAME
               ////////////////////////////////////////////////////////////
 
               TextField(
                 controller: nameController,
                 decoration: const InputDecoration(
-                  labelText: "ชื่อห้อง",
+                  labelText: "ชื่ออุปกรณ์",
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -181,14 +166,14 @@ class _AddProductPageState extends State<AddRoomPage> {
               const SizedBox(height: 15),
 
               ////////////////////////////////////////////////////////////
-              // 💰 Price
+              // 📦 NUM
               ////////////////////////////////////////////////////////////
 
               TextField(
-                controller: capacityController,
-                
+                controller: numController,
+                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
-                  labelText: "ความจุ",
+                  labelText: "จำนวน",
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -196,14 +181,14 @@ class _AddProductPageState extends State<AddRoomPage> {
               const SizedBox(height: 15),
 
               ////////////////////////////////////////////////////////////
-              // 📝 Description
+              // 📝 DETAIL
               ////////////////////////////////////////////////////////////
 
               TextField(
-                controller: locationcontroller,
+                controller: detailController,
                 maxLines: 3,
                 decoration: const InputDecoration(
-                  labelText: "สถานที่",
+                  labelText: "รายละเอียด",
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -211,14 +196,14 @@ class _AddProductPageState extends State<AddRoomPage> {
               const SizedBox(height: 20),
 
               ////////////////////////////////////////////////////////////
-              // ✅ Button
+              // BUTTON
               ////////////////////////////////////////////////////////////
 
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: saveProduct,
-                  child: const Text("บันทึกห้อง"),
+                  onPressed: saveEquipment,
+                  child: const Text("บันทึก"),
                 ),
               ),
             ],

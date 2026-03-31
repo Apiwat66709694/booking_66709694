@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_booking_66709694/login_admin.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'booking_page.dart';
@@ -24,8 +25,8 @@ class RoomList extends StatefulWidget {
 }
 
 class _RoomListState extends State<RoomList> {
-  List rooms = [];
-  List filteredRooms = [];
+  List equipment = [];
+  List filteredequipment = [];
 
   TextEditingController searchController = TextEditingController();
 
@@ -36,21 +37,21 @@ class _RoomListState extends State<RoomList> {
   @override
   void initState() {
     super.initState();
-    fetchRooms();
+    fetchequipment();
   }
 
   ////////////////////////////////////////////////////////////
   // FETCH ROOMS
   ////////////////////////////////////////////////////////////
 
-  Future<void> fetchRooms() async {
+  Future<void> fetchequipment() async {
     final response =
         await http.get(Uri.parse("${baseUrl}get_rooms.php"));
 
     if (response.statusCode == 200) {
       setState(() {
-        rooms = json.decode(response.body);
-        filteredRooms = rooms;
+       equipment = json.decode(response.body);
+        filteredequipment = equipment;
       });
     }
   }
@@ -60,13 +61,13 @@ class _RoomListState extends State<RoomList> {
   ////////////////////////////////////////////////////////////
 
   void searchRoom(String keyword) {
-    final results = rooms.where((room) {
+    final results = equipment.where((room) {
       final name = room['room_name'].toString().toLowerCase();
       return name.contains(keyword.toLowerCase());
     }).toList();
 
     setState(() {
-      filteredRooms = results;
+      filteredequipment = results;
     });
   }
 
@@ -113,34 +114,68 @@ class _RoomListState extends State<RoomList> {
       // APPBAR
       ////////////////////////////////////////////////////////
 
+      backgroundColor: const Color.fromARGB(255, 255, 84, 232), // ✅ ใส่ตรงนี้
       appBar: AppBar(
-        title: Text("Meeting Room (${widget.name})"),
-        actions: [
-          //////////////////////////////////////////////////////
-          // ดูรายการจอง
-          //////////////////////////////////////////////////////
-          IconButton(
-            icon: const Icon(Icons.list_alt),
-            tooltip: "ดูการจองทั้งหมด",
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const BookingList(),
-                ),
-              );
-            },
-          ),
+        title: const Text('หน้าแรก'),
+        backgroundColor: const Color.fromARGB(255, 255, 217, 244),
+        foregroundColor: const Color.fromARGB(255, 252, 110, 110), // ✅ สีไอคอน + ข้อความ
+      ),
 
-          //////////////////////////////////////////////////////
-          // LOGOUT
-          //////////////////////////////////////////////////////
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: "ออกจากระบบ",
-            onPressed: logout,
-          ),
-        ],
+      // 🔹 Drawer = เมนูด้านข้าง (เลื่อนจากซ้าย)
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero, // เอาช่องว่างด้านบนออก
+          children: [
+            // 🔸 Header ของ Drawer (ส่วนหัว)
+            const UserAccountsDrawerHeader(
+              accountName: Text('ใส่ชื่อนักศึกษา'), // ชื่อผู้ใช้
+              accountEmail: Text('ใส่รหัสนักศึกษา'), // อีเมล
+              currentAccountPicture: CircleAvatar(
+                child: Icon(Icons.person), // ไอคอนโปรไฟล์
+              ),
+            ),
+
+            // 🔸 เมนู: หน้าแรก
+            ListTile(
+              leading: const Icon(Icons.home), // ไอคอน
+              title: const Text('หน้าแรก'), // ข้อความเมนู
+              onTap: () {
+                Navigator.pop(context); // ปิด Drawer
+              },
+            ),
+
+            // 🔸 เมนู: ไปหน้า Page 1
+            ListTile(
+              leading: const Icon(Icons.shopping_cart),
+              title: const Text('อุปกรณ์'),
+              onTap: () {
+                Navigator.pop(context); // ปิด Drawer ก่อน
+
+                // 🔹 เปิดหน้าใหม่ (Page1)
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const BookingList()),
+                );
+              },
+            ),
+
+            // 🔸 เมนู: ไปหน้า Page 2
+            ListTile(
+              leading: const Icon(Icons.login),
+              title: const Text('เข้าสู่ระบบ'),
+              onTap: () {
+                Navigator.pop(context); // ปิด Drawer ก่อน
+
+                // 🔹 เปิดหน้าใหม่ (Page2)
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginAdmin()),
+                );
+              },
+            ),
+            
+          ],
+        ),
       ),
 
       ////////////////////////////////////////////////////////
@@ -157,7 +192,7 @@ class _RoomListState extends State<RoomList> {
             child: TextField(
               controller: searchController,
               decoration: const InputDecoration(
-                hintText: "ค้นหาห้องประชุม...",
+                hintText: "ค้นหาสินค้า...",
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(),
               ),
@@ -169,12 +204,12 @@ class _RoomListState extends State<RoomList> {
           // ROOM LIST
           //////////////////////////////////////////////////////
           Expanded(
-            child: filteredRooms.isEmpty
-                ? const Center(child: Text("ไม่พบข้อมูลห้อง"))
+            child: filteredequipment.isEmpty
+                ? const Center(child: Text("ไม่พบข้อมูลสินค้า"))
                 : ListView.builder(
-                    itemCount: filteredRooms.length,
+                    itemCount: filteredequipment.length,
                     itemBuilder: (context, index) {
-                      final room = filteredRooms[index];
+                      final room = filteredequipment[index];
 
                       String imageUrl =
                           "${baseUrl}images/${room['image'] ?? ''}";
@@ -204,7 +239,7 @@ class _RoomListState extends State<RoomList> {
                           // TITLE
                           ////////////////////////////////////////////////////
                           title: Text(
-                            room['room_name'] ?? "",
+                            room['eq_name'] ?? "",
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold),
                           ),
@@ -217,9 +252,9 @@ class _RoomListState extends State<RoomList> {
                                 CrossAxisAlignment.start,
                             children: [
                               Text(
-                                  "Capacity: ${room['capacity']} คน"),
+                                  "จำนวน: ${room['num']} ชิ้น"),
                               Text(
-                                  "Location: ${room['location']}"),
+                                  "รายระเอียด: ${room['detail']}"),
                             ],
                           ),
 
@@ -230,46 +265,9 @@ class _RoomListState extends State<RoomList> {
                             direction: Axis.vertical,
                             spacing: 2,
                             children: [
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  foregroundColor: Colors.white,
-                                  minimumSize: const Size(70, 28),
-                                  padding:
-                                      const EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 2),
-                                ),
-                                child: const Text("จอง"),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          BookingPage(
-                                            room: room,
-                                            name: widget.name
-                                            ),
-                       
-                                    ),
-                                  );
-                                },
-                              ),
+                             
 
-                              IconButton(
-                                icon: const Icon(Icons.event_note,
-                                    color: Colors.orange),
-                                tooltip: "ดูข้อมูลการจอง",
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => BookingList(
-                                        roomId: room['id'],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
+                              
                             ],
                           ),
                         ),

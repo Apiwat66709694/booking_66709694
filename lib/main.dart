@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_booking_66709694/room_list.dart';
 import 'Home_page.dart';
 
 void main() {
@@ -14,8 +15,8 @@ class MyApp extends StatelessWidget {
 
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Meeting Room Booking',
-      home: HomePage(),   // ✅ หน้าแรกแสดงรายการห้องประชุม
+      title: 'equipment',
+      home: RoomList(name: '',),   // ✅ หน้าแรกแสดงรายการห้องประชุม
     );
 
   }

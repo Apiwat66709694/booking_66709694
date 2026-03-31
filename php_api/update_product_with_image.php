@@ -14,22 +14,31 @@ header('Content-Type: application/json');
 
 try {
 
-    $id = $_POST['id'];
-    $room_name = $_POST['room_name'];
-    $capacity = $_POST['capacity'];
-    $location = $_POST['location'];
+    ////////////////////////////////////////////////////////////
+    // ✅ รับค่า (equipment)
+    ////////////////////////////////////////////////////////////
+
+    $id      = $_POST['id'];
+    $eq_name = $_POST['eq_name'];
+    $detail  = $_POST['detail'];
+    $num     = $_POST['num'];
     $oldImage = $_POST['old_image'];
 
     $imageName = $oldImage;
 
+    ////////////////////////////////////////////////////////////
+    // ✅ อัปโหลดรูปใหม่
+    ////////////////////////////////////////////////////////////
+
     if (isset($_FILES['image'])) {
 
         $targetDir = "images/";
-        $imageName = time() . "_" . basename($_FILES["image"]["room_name"]);
+        $imageName = time() . "_" . basename($_FILES["image"]["name"]); // ✅ แก้ตรงนี้
         $targetFile = $targetDir . $imageName;
 
         if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile)) {
 
+            // ลบรูปเก่า
             if ($oldImage != "" && file_exists($targetDir . $oldImage)) {
                 unlink($targetDir . $oldImage);
             }
@@ -43,19 +52,23 @@ try {
         }
     }
 
-    $sql = "UPDATE rooms 
-            SET room_name = :room_name,
-                capacity = :capacity,
-                location = :location,
-                image = :image
+    ////////////////////////////////////////////////////////////
+    // ✅ UPDATE DB
+    ////////////////////////////////////////////////////////////
+
+    $sql = "UPDATE equipment 
+            SET eq_name = :eq_name,
+                detail  = :detail,
+                num     = :num,
+                image   = :image
             WHERE id = :id";
 
     $stmt = $conn->prepare($sql);
 
     $stmt->bindParam(':id', $id);
-    $stmt->bindParam(':room_name', $room_name);
-    $stmt->bindParam(':capacity', $capacity);
-    $stmt->bindParam(':location', $location);
+    $stmt->bindParam(':eq_name', $eq_name);
+    $stmt->bindParam(':detail', $detail);
+    $stmt->bindParam(':num', $num);
     $stmt->bindParam(':image', $imageName);
 
     $stmt->execute();

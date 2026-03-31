@@ -61,13 +61,13 @@ class _BookingListState extends State<BookingList> {
       appBar: AppBar(
         title: Text(
           widget.roomId == null
-          ? "รายการจองทั้งหมด"
-          : "รายการจองห้อง"
+          ? "รายการซื้ออุปกรณ์"
+          : "รายการซื้ออุปกรณ์"
         ),
       ),
 
       body: bookings.isEmpty
-      ? const Center(child: Text("ยังไม่มีการจอง"))
+      ? const Center(child: Text("ยังไม่มีการชื้อ"))
       : ListView.builder(
 
         itemCount: bookings.length,
@@ -106,7 +106,7 @@ class _BookingListState extends State<BookingList> {
 
                   const SizedBox(height: 5),
 
-                  Text("ผู้จอง: ${b['user_name']}"),
+                  Text("ผู้ชื้อ: ${b['user_name']}"),
 
                   Text("วันที่: ${b['booking_date']}"),
 

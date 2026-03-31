@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 
 $id = intval($_GET['id']);
 
-$stmt = $conn->prepare("DELETE FROM rooms WHERE id = ?");
+$stmt = $conn->prepare("DELETE FROM equipment WHERE id = ?");
 $result = $stmt->execute([$id]);
 
 echo json_encode(["success" => $result]);

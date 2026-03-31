@@ -3,9 +3,13 @@ include 'condb.php';
 
 header('Content-Type: application/json');
 
-$room_name = $_POST['room_name'];
-$capacity = $_POST['capacity'];
-$location = $_POST['location'];
+////////////////////////////////////////////////////////////
+// ✅ รับค่าจาก Flutter
+////////////////////////////////////////////////////////////
+
+$eq_name = $_POST['eq_name'] ?? '';
+$detail  = $_POST['detail'] ?? '';
+$num     = $_POST['num'] ?? '';
 
 ////////////////////////////////////////////////////////////
 // ✅ รับรูปภาพ
@@ -15,7 +19,7 @@ $imageName = "";
 
 if (isset($_FILES['image'])) {
 
-    $targetDir = "images/";   // ✅ โฟลเดอร์เก็บรูป
+    $targetDir = "images/";
     $imageName = time() . "_" . basename($_FILES["image"]["name"]);
     $targetFile = $targetDir . $imageName;
 
@@ -29,19 +33,19 @@ if (isset($_FILES['image'])) {
 }
 
 ////////////////////////////////////////////////////////////
-// ✅ Insert DB
+// ✅ Insert DB (equipment)
 ////////////////////////////////////////////////////////////
 
 try {
 
     $stmt = $conn->prepare("
-        INSERT INTO rooms (room_name, capacity, location, image)
-        VALUES (:room_name, :capacity, :location, :image)
+        INSERT INTO equipment (eq_name, detail, num, image)
+        VALUES (:eq_name, :detail, :num, :image)
     ");
 
-    $stmt->bindParam(":room_name", $room_name);
-    $stmt->bindParam(":capacity", $capacity);
-    $stmt->bindParam(":location", $location);
+    $stmt->bindParam(":eq_name", $eq_name);
+    $stmt->bindParam(":detail", $detail);
+    $stmt->bindParam(":num", $num);
     $stmt->bindParam(":image", $imageName);
 
     if ($stmt->execute()) {
@@ -56,3 +60,4 @@ try {
         "error" => $e->getMessage()
     ]);
 }
+?>

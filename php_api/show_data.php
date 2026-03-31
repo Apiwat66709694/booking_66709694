@@ -3,7 +3,7 @@ include "condb.php";
 
 try {
 
-    $stmt = $conn->query("SELECT * FROM rooms");
+    $stmt = $conn->query("SELECT * FROM equipment");
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode($users);
     

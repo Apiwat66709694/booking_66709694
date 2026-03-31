@@ -6,7 +6,7 @@ include "condb.php";
 
 try {
 
-    $stmt = $conn->query("SELECT * FROM rooms");
+    $stmt = $conn->query("SELECT * FROM equipment");
 
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
